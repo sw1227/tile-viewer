@@ -1,6 +1,10 @@
+import MapView from './components/Map'
+
 function App() {
   return (
-    <div>hello</div>
+    <div>
+      <MapView />
+    </div>
   )
 }
 
