@@ -12,17 +12,10 @@ import {
   TabPanel,
   VStack,
   StackDivider,
-  Button,
   Center,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
-  HStack,
-  Code,
 } from '@chakra-ui/react'
 import { PanelState, reducer } from './reducer'
+import TileSelector from './TileSelector'
 
 type LeftPanelProps = {
   initState: PanelState
@@ -76,68 +69,13 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ initState, onChange, onGoToTileCl
                 </FormControl>
               </Center>
               <Center>
-                <VStack>
-                  <Text align="center">
-                    指定したタイル座標 <Code>z/x/y </Code> へ移動
-                  </Text>
-                  <HStack>
-                    <NumberInput
-                      min={1}
-                      max={20}
-                      maxW="60px"
-                      size="xs"
-                      value={state.targetTileCoordinate.z}
-                      onChange={(_, value) => {
-                        dispatch({ type: 'setTargetTile', payload: { z: value } })
-                      }}
-                    >
-                      <NumberInputField />
-                      <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
-                      </NumberInputStepper>
-                    </NumberInput>
-                    <NumberInput
-                      min={0}
-                      max={2 ** state.targetTileCoordinate.z - 1}
-                      maxW="80px"
-                      size="xs"
-                      value={state.targetTileCoordinate.x}
-                      onChange={(_, value) => {
-                        dispatch({ type: 'setTargetTile', payload: { x: value } })
-                      }}
-                    >
-                      <NumberInputField />
-                      <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
-                      </NumberInputStepper>
-                    </NumberInput>
-                    <NumberInput
-                      min={0}
-                      max={2 ** state.targetTileCoordinate.z - 1}
-                      maxW="80px"
-                      size="xs"
-                      value={state.targetTileCoordinate.y}
-                      onChange={(_, value) => {
-                        dispatch({ type: 'setTargetTile', payload: { y: value } })
-                      }}
-                    >
-                      <NumberInputField />
-                      <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
-                      </NumberInputStepper>
-                    </NumberInput>
-                    <Button
-                      size="sm"
-                      ml="2"
-                      onClick={() => onGoToTileClick(state.targetTileCoordinate)}
-                    >
-                      Go
-                    </Button>
-                  </HStack>
-                </VStack>
+                <TileSelector
+                  tileCoordinate={state.targetTileCoordinate}
+                  onChange={(payload: { z?: number; x?: number; y?: number }) => {
+                    dispatch({ type: 'setTargetTile', payload })
+                  }}
+                  onGoToTileClick={onGoToTileClick}
+                />
               </Center>
             </VStack>
           </TabPanel>
