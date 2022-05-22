@@ -18,6 +18,7 @@ const initPanelState: PanelState = {
   showTile: false,
   targetTileCoordinate: { z: 12, x: 3638, y: 1612 },
   selectedTiles: {},
+  tileOpacities: {},
 }
 
 const useMap = (options: MapboxOptions) => {

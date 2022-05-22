@@ -30,9 +30,6 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ initState, mapboxMap: map }) => {
   const [state, dispatch] = useReducer(reducer, initState)
 
   useEffect(() => {
-    // Update boundary setting
-    if (map) map.showTileBoundaries = state.showTile
-
     // Update raster layers
     Object.entries(state.selectedTiles).forEach(([tileId, checked]) => {
       if (checked) {
@@ -53,7 +50,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ initState, mapboxMap: map }) => {
             id: tileId,
             type: 'raster',
             source: tileId,
-            paint: { 'raster-opacity': 0.5 }, // TODO: set by slider
+            paint: { 'raster-opacity': state.tileOpacities[tileId as TileId] || 0.5 },
           })
         }
       } else {
@@ -63,7 +60,21 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ initState, mapboxMap: map }) => {
         }
       }
     })
-  }, [map, state])
+  }, [map, state.selectedTiles])
+
+  useEffect(() => {
+    // Update boundary setting
+    if (map) map.showTileBoundaries = state.showTile
+  }, [map, state.showTile])
+
+  useEffect(() => {
+    Object.entries(state.tileOpacities).forEach(([tileId, opacity]) => {
+      // Update layer opacity if layer exists
+      if (map?.getLayer(tileId)) {
+        map?.setPaintProperty(tileId, 'raster-opacity', opacity)
+      }
+    })
+  }, [map, state.tileOpacities])
 
   const moveToTileCoord = useCallback(
     (tile: PanelState['targetTileCoordinate']) => {
@@ -101,8 +112,12 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ initState, mapboxMap: map }) => {
           <TabPanel>
             <TileTab
               selectedTiles={state.selectedTiles}
-              onChange={(payload: { tileId: TileId; checked: boolean }) => {
+              opacities={state.tileOpacities}
+              onChangeCheck={(payload: { tileId: TileId; checked: boolean }) => {
                 dispatch({ type: 'setTileChecked', payload })
+              }}
+              onChangeOpacity={(payload: { tileId: TileId; opacity: number }) => {
+                dispatch({ type: 'setTileOpacity', payload })
               }}
             />
           </TabPanel>

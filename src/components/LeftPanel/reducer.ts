@@ -9,12 +9,14 @@ export type PanelState = {
     y: number
   }
   selectedTiles: { [key in TileId]?: boolean }
+  tileOpacities: { [key in TileId]?: number }
 }
 
 type Action =
   | { type: 'toggleShowTile' }
   | { type: 'setTargetTile'; payload: { z?: number; x?: number; y?: number } }
   | { type: 'setTileChecked'; payload: { tileId: TileId; checked: boolean } }
+  | { type: 'setTileOpacity'; payload: { tileId: TileId; opacity: number } }
 
 export const reducer: Reducer<PanelState, Action> = (state, action) => {
   switch (action.type) {
@@ -37,6 +39,11 @@ export const reducer: Reducer<PanelState, Action> = (state, action) => {
       return {
         ...state,
         selectedTiles: { ...state.selectedTiles, [action.payload.tileId]: action.payload.checked },
+      }
+    case 'setTileOpacity':
+      return {
+        ...state,
+        tileOpacities: { ...state.tileOpacities, [action.payload.tileId]: action.payload.opacity },
       }
   }
 }

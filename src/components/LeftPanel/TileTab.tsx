@@ -15,10 +15,17 @@ import { TILE_CATALOG, TileId } from './constants'
 
 type TileTabProps = {
   selectedTiles: { [key in TileId]?: boolean }
-  onChange: (payload: { tileId: TileId; checked: boolean }) => void
+  opacities: { [key in TileId]?: number }
+  onChangeCheck: (payload: { tileId: TileId; checked: boolean }) => void // TODO: rename
+  onChangeOpacity: (payload: { tileId: TileId; opacity: number }) => void
 }
 
-const TileTab: React.FC<TileTabProps> = ({ selectedTiles, onChange }) => {
+const TileTab: React.FC<TileTabProps> = ({
+  selectedTiles,
+  opacities,
+  onChangeCheck,
+  onChangeOpacity,
+}) => {
   const tile = { z: 12, x: 3638, y: 1612 }
   return (
     <VStack divider={<StackDivider borderColor="gray.200" />}>
@@ -35,13 +42,21 @@ const TileTab: React.FC<TileTabProps> = ({ selectedTiles, onChange }) => {
               <Checkbox
                 isChecked={isChecked}
                 onChange={(e) => {
-                  onChange({ tileId, checked: e.target.checked })
+                  onChangeCheck({ tileId, checked: e.target.checked })
                 }}
               >
                 <Heading size="xs">{TILE_CATALOG[tileId].name}</Heading>
               </Checkbox>
               {!isChecked ? null : (
-                <RangeSlider defaultValue={[0.5]} min={0} max={1} step={0.1}>
+                <RangeSlider
+                  value={[opacities[tileId] || 0.5]}
+                  min={0}
+                  max={1}
+                  step={0.1}
+                  onChange={([value]) => {
+                    onChangeOpacity({ tileId, opacity: value })
+                  }}
+                >
                   <RangeSliderTrack>
                     <RangeSliderFilledTrack />
                   </RangeSliderTrack>
