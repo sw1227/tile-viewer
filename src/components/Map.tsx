@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect } from 'react'
 import mapboxgl, { MapboxOptions } from 'mapbox-gl'
 import LeftPanel from './LeftPanel/LeftPanel'
 import { PanelState } from './LeftPanel/reducer'
-import { tileToBBOX } from '@mapbox/tilebelt'
 
 const initOptions: MapboxOptions = {
   // token: only for public usage (URL restricted)
@@ -33,32 +32,10 @@ const useMap = (options: MapboxOptions) => {
 const MapView = () => {
   const [map, setMap] = useMap(initOptions)
 
-  const handleChange = useCallback(
-    (state: PanelState) => {
-      if (map) map.showTileBoundaries = state.showTile
-    },
-    [map],
-  )
-
-  const moveToTileCoord = useCallback(
-    (tile: PanelState['targetTileCoordinate']) => {
-      const [w, s, e, n] = tileToBBOX([tile.x, tile.y, tile.z])
-      map?.fitBounds([
-        [w, s],
-        [e, n],
-      ])
-    },
-    [map],
-  )
-
   return (
     <>
       <div id="mapbox" />
-      <LeftPanel
-        initState={initPanelState}
-        onChange={handleChange}
-        onGoToTileClick={moveToTileCoord}
-      />
+      <LeftPanel initState={initPanelState} mapboxMap={map} />
     </>
   )
 }

@@ -1,4 +1,6 @@
-import { useEffect, useReducer } from 'react'
+import { useEffect, useReducer, useCallback } from 'react'
+import mapboxgl from 'mapbox-gl'
+import { tileToBBOX } from '@mapbox/tilebelt'
 import {
   Box,
   Text,
@@ -17,17 +19,62 @@ import {
 import { PanelState, reducer } from './reducer'
 import TileCoordSelector from './TileCoordSelector'
 import TileTab from './TileTab'
-import { TileId } from './constants'
+import { TileId, TILE_CATALOG } from './constants'
 
 type LeftPanelProps = {
   initState: PanelState
-  onChange: (state: PanelState) => void
-  onGoToTileClick: (tile: PanelState['targetTileCoordinate']) => void
+  mapboxMap: mapboxgl.Map | undefined
 }
 
-const LeftPanel: React.FC<LeftPanelProps> = ({ initState, onChange, onGoToTileClick }) => {
+const LeftPanel: React.FC<LeftPanelProps> = ({ initState, mapboxMap: map }) => {
   const [state, dispatch] = useReducer(reducer, initState)
-  useEffect(() => onChange(state), [state])
+
+  useEffect(() => {
+    // Update boundary setting
+    if (map) map.showTileBoundaries = state.showTile
+
+    // Update raster layers
+    Object.entries(state.selectedTiles).forEach(([tileId, checked]) => {
+      if (checked) {
+        // Add source and layer if not exist
+        if (!map?.getSource(tileId)) {
+          map?.addSource(tileId, {
+            type: 'raster',
+            tiles: [TILE_CATALOG[tileId as TileId].url],
+            tileSize: 256,
+            minzoom: 4,
+            maxzoom: 16,
+            attribution:
+              '地理院タイル(色別標高図の海域部は海上保安庁海洋情報部の資料を使用して作成)',
+          })
+        }
+        if (!map?.getLayer(tileId)) {
+          map?.addLayer({
+            id: tileId,
+            type: 'raster',
+            source: tileId,
+            paint: { 'raster-opacity': 0.5 }, // TODO: set by slider
+          })
+        }
+      } else {
+        // Remove layer if exists (source is not removed)
+        if (map?.getLayer(tileId)) {
+          map?.removeLayer(tileId)
+        }
+      }
+    })
+  }, [map, state])
+
+  const moveToTileCoord = useCallback(
+    (tile: PanelState['targetTileCoordinate']) => {
+      const [w, s, e, n] = tileToBBOX([tile.x, tile.y, tile.z])
+      map?.fitBounds([
+        [w, s],
+        [e, n],
+      ])
+    },
+    [map],
+  )
 
   return (
     <Box
@@ -81,7 +128,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ initState, onChange, onGoToTileCl
                   onChange={(payload: { z?: number; x?: number; y?: number }) => {
                     dispatch({ type: 'setTargetTile', payload })
                   }}
-                  onGoToTileClick={onGoToTileClick}
+                  onGoToTileClick={moveToTileCoord}
                 />
               </Center>
             </VStack>
