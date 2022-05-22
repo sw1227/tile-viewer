@@ -17,6 +17,7 @@ import {
 import { PanelState, reducer } from './reducer'
 import TileCoordSelector from './TileCoordSelector'
 import TileTab from './TileTab'
+import { TileId } from './constants'
 
 type LeftPanelProps = {
   initState: PanelState
@@ -51,7 +52,12 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ initState, onChange, onGoToTileCl
 
         <TabPanels>
           <TabPanel>
-            <TileTab />
+            <TileTab
+              selectedTiles={state.selectedTiles}
+              onChange={(payload: { tileId: TileId; checked: boolean }) => {
+                dispatch({ type: 'setTileChecked', payload })
+              }}
+            />
           </TabPanel>
           <TabPanel>
             <VStack divider={<StackDivider borderColor="gray.200" />} spacing={4} align="stretch">

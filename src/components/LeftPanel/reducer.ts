@@ -1,4 +1,5 @@
 import { Reducer } from 'react'
+import { TileId } from './constants'
 
 export type PanelState = {
   showTile: boolean // set map.showTileBoundaries or not
@@ -7,11 +8,13 @@ export type PanelState = {
     x: number
     y: number
   }
+  selectedTiles: { [key in TileId]?: boolean }
 }
 
 type Action =
   | { type: 'toggleShowTile' }
   | { type: 'setTargetTile'; payload: { z?: number; x?: number; y?: number } }
+  | { type: 'setTileChecked'; payload: { tileId: TileId; checked: boolean } }
 
 export const reducer: Reducer<PanelState, Action> = (state, action) => {
   switch (action.type) {
@@ -29,6 +32,11 @@ export const reducer: Reducer<PanelState, Action> = (state, action) => {
       return {
         ...state,
         targetTileCoordinate: { ...oldTile, ...updates },
+      }
+    case 'setTileChecked':
+      return {
+        ...state,
+        selectedTiles: { ...state.selectedTiles, [action.payload.tileId]: action.payload.checked },
       }
   }
 }
