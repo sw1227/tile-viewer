@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
 import mapboxgl, { MapboxOptions } from 'mapbox-gl'
 import LeftPanel from './LeftPanel/LeftPanel'
 import { PanelState } from './LeftPanel/reducer'
+import { useMap } from './hooks'
 
 const initOptions: MapboxOptions = {
   // token: only for public usage (URL restricted)
@@ -19,15 +19,6 @@ const initPanelState: PanelState = {
   targetTileCoordinate: { z: 12, x: 3638, y: 1612 },
   selectedTiles: {},
   tileOpacities: {},
-}
-
-const useMap = (options: MapboxOptions) => {
-  const [mapboxMap, setMap] = useState<mapboxgl.Map>()
-  useEffect(() => {
-    setMap(new mapboxgl.Map(options))
-  }, [])
-
-  return [mapboxMap, setMap] as const
 }
 
 const MapView = () => {

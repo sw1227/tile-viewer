@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useCallback } from 'react'
+import { useReducer, useCallback } from 'react'
 import mapboxgl from 'mapbox-gl'
 import { tileToBBOX } from '@mapbox/tilebelt'
 import {
@@ -19,7 +19,8 @@ import {
 import { PanelState, reducer } from './reducer'
 import TileCoordSelector from './TileCoordSelector'
 import TileTab from './TileTab'
-import { TileId, TILE_CATALOG } from './constants'
+import { TileId } from './constants'
+import { useMapEffect } from '../hooks'
 
 type LeftPanelProps = {
   initState: PanelState
@@ -28,53 +29,7 @@ type LeftPanelProps = {
 
 const LeftPanel: React.FC<LeftPanelProps> = ({ initState, mapboxMap: map }) => {
   const [state, dispatch] = useReducer(reducer, initState)
-
-  useEffect(() => {
-    // Update raster layers
-    Object.entries(state.selectedTiles).forEach(([tileId, checked]) => {
-      if (checked) {
-        // Add source and layer if not exist
-        if (!map?.getSource(tileId)) {
-          map?.addSource(tileId, {
-            type: 'raster',
-            tiles: [TILE_CATALOG[tileId as TileId].url],
-            tileSize: 256,
-            minzoom: 4,
-            maxzoom: 16,
-            attribution:
-              '地理院タイル(色別標高図の海域部は海上保安庁海洋情報部の資料を使用して作成)',
-          })
-        }
-        if (!map?.getLayer(tileId)) {
-          map?.addLayer({
-            id: tileId,
-            type: 'raster',
-            source: tileId,
-            paint: { 'raster-opacity': state.tileOpacities[tileId as TileId] || 0.5 },
-          })
-        }
-      } else {
-        // Remove layer if exists (source is not removed)
-        if (map?.getLayer(tileId)) {
-          map?.removeLayer(tileId)
-        }
-      }
-    })
-  }, [map, state.selectedTiles])
-
-  useEffect(() => {
-    // Update boundary setting
-    if (map) map.showTileBoundaries = state.showTile
-  }, [map, state.showTile])
-
-  useEffect(() => {
-    Object.entries(state.tileOpacities).forEach(([tileId, opacity]) => {
-      // Update layer opacity if layer exists
-      if (map?.getLayer(tileId)) {
-        map?.setPaintProperty(tileId, 'raster-opacity', opacity)
-      }
-    })
-  }, [map, state.tileOpacities])
+  useMapEffect(state, map)
 
   const moveToTileCoord = useCallback(
     (tile: PanelState['targetTileCoordinate']) => {
