@@ -8,7 +8,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@chakra-ui/react": "^2.0.2",
+    "@emotion/react": "^11.9.0",
+    "@emotion/styled": "^11.8.1",
     "@types/mapbox-gl": "^2.7.2",
+    "framer-motion": "^6.3.3",
     "mapbox-gl": "^2.8.2",
     "react": "^18.0.0",
     "react-dom": "^18.0.0"

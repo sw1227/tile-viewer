@@ -1,5 +1,6 @@
-import mapboxgl, { MapboxOptions } from 'mapbox-gl'
 import { useState, useEffect } from 'react'
+import mapboxgl, { MapboxOptions } from 'mapbox-gl'
+import { Box } from '@chakra-ui/react'
 
 const initOptions: MapboxOptions = {
   // token: only for public usage (URL restricted)
@@ -24,7 +25,12 @@ const MapView = () => {
   const [map, setMap] = useMap(initOptions)
 
   return (
-    <div id="mapbox" />
+    <>
+      <div id="mapbox" />
+      <Box position='absolute' left='0' top='0' bg='white' boxShadow='md' w='350px' h='100vh' overflow='scroll' p={4} color='white'>
+        This is the Box
+      </Box>
+    </>
   )
 }
 
