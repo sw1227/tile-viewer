@@ -1,17 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import mapboxgl, { MapboxOptions } from 'mapbox-gl'
-import {
-  Box,
-  Text,
-  Switch,
-  FormControl,
-  FormLabel,
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabPanel,
-} from '@chakra-ui/react'
+import LeftPanel from './LeftPanel/LeftPanel'
+import { PanelState } from './LeftPanel/reducer'
 
 const initOptions: MapboxOptions = {
   // token: only for public usage (URL restricted)
@@ -24,6 +14,8 @@ const initOptions: MapboxOptions = {
   zoom: 12,
 } as const
 
+const initPanelState: PanelState = { showTile: false }
+
 const useMap = (options: MapboxOptions) => {
   const [mapboxMap, setMap] = useState<mapboxgl.Map>()
   useEffect(() => {
@@ -33,58 +25,20 @@ const useMap = (options: MapboxOptions) => {
   return [mapboxMap, setMap] as const
 }
 
-const useToggle = (initState = false) => {
-  const [state, setState] = useState(initState)
-  const toggle = useCallback(() => setState((state) => !state), [])
-  return [state, toggle] as const
-}
-
 const MapView = () => {
   const [map, setMap] = useMap(initOptions)
-  const [showTile, setShowTile] = useToggle()
 
-  useEffect(() => {
-    if (map) map.showTileBoundaries = showTile
-  }, [map, showTile])
+  const handleChange = useCallback(
+    (state: PanelState) => {
+      if (map) map.showTileBoundaries = state.showTile
+    },
+    [map],
+  )
 
   return (
     <>
       <div id="mapbox" />
-      <Box
-        position="absolute"
-        left="0"
-        top="0"
-        bg="white"
-        boxShadow="md"
-        w="350px"
-        h="100vh"
-        overflow="scroll"
-        p={4}
-      >
-        <Text align="center" fontSize="2xl">
-          Tile viewer
-        </Text>
-        <Tabs>
-          <TabList>
-            <Tab>Tile</Tab>
-            <Tab>Coordinate</Tab>
-          </TabList>
-
-          <TabPanels>
-            <TabPanel>
-              <p>one!</p>
-            </TabPanel>
-            <TabPanel>
-              <FormControl display="flex" alignItems="center">
-                <FormLabel htmlFor="show-tile" mb="0">
-                  Show tile coordinate?
-                </FormLabel>
-                <Switch id="show-tile" onChange={setShowTile} isChecked={showTile} />
-              </FormControl>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </Box>
+      <LeftPanel initState={initPanelState} onChange={handleChange} />
     </>
   )
 }
