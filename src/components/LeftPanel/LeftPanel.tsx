@@ -15,7 +15,8 @@ import {
   Center,
 } from '@chakra-ui/react'
 import { PanelState, reducer } from './reducer'
-import TileSelector from './TileSelector'
+import TileCoordSelector from './TileCoordSelector'
+import TileTab from './TileTab'
 
 type LeftPanelProps = {
   initState: PanelState
@@ -50,7 +51,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ initState, onChange, onGoToTileCl
 
         <TabPanels>
           <TabPanel>
-            <p>one!</p>
+            <TileTab />
           </TabPanel>
           <TabPanel>
             <VStack divider={<StackDivider borderColor="gray.200" />} spacing={4} align="stretch">
@@ -69,7 +70,7 @@ const LeftPanel: React.FC<LeftPanelProps> = ({ initState, onChange, onGoToTileCl
                 </FormControl>
               </Center>
               <Center>
-                <TileSelector
+                <TileCoordSelector
                   tileCoordinate={state.targetTileCoordinate}
                   onChange={(payload: { z?: number; x?: number; y?: number }) => {
                     dispatch({ type: 'setTargetTile', payload })
