@@ -4,7 +4,8 @@ import { Box } from '@chakra-ui/react'
 
 const initOptions: MapboxOptions = {
   // token: only for public usage (URL restricted)
-  accessToken: "pk.eyJ1Ijoic3cxMjI3IiwiYSI6ImNrbngyazRhcjBtY3Iyd3RnODhjbDhscWsifQ.6Uc-Lboqa0WhZbnnFJWFSA",
+  accessToken:
+    'pk.eyJ1Ijoic3cxMjI3IiwiYSI6ImNrbngyazRhcjBtY3Iyd3RnODhjbDhscWsifQ.6Uc-Lboqa0WhZbnnFJWFSA',
   container: 'mapbox',
   style: 'mapbox://styles/mapbox/light-v10',
   localIdeographFontFamily: 'sans-serif',
@@ -19,7 +20,7 @@ const useMap = (options: MapboxOptions) => {
   }, [])
 
   return [map, setMap]
-};
+}
 
 const MapView = () => {
   const [map, setMap] = useMap(initOptions)
@@ -27,7 +28,18 @@ const MapView = () => {
   return (
     <>
       <div id="mapbox" />
-      <Box position='absolute' left='0' top='0' bg='white' boxShadow='md' w='350px' h='100vh' overflow='scroll' p={4} color='white'>
+      <Box
+        position="absolute"
+        left="0"
+        top="0"
+        bg="white"
+        boxShadow="md"
+        w="350px"
+        h="100vh"
+        overflow="scroll"
+        p={4}
+        color="white"
+      >
         This is the Box
       </Box>
     </>
